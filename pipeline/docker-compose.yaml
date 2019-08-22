@@ -1,0 +1,83 @@
+version: '2'
+services:
+
+  mongo:
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    ports:
+      - "27017:27017"
+
+
+  zookeeper:
+    image: wurstmeister/zookeeper
+    ports:
+      - "2181:2181"
+
+  kafka:
+    image: wurstmeister/kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_ADVERTISED_HOST_NAME: kafka
+
+#      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+#      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+#      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_CREATE_TOPICS: "pizza:1:1"
+#    volumes:
+#      - /var/run/docker.sock:/var/run/docker.sock
+
+  producer:
+    image: producer
+    build:
+      context: ../producer
+      dockerfile: Dockerfile
+    depends_on:
+      - kafka
+    environment:
+      KAFKA_SERVICE: kafka:9092
+
+    restart: always
+
+
+  consumer:
+    image: consumer
+    build:
+      context: ../consumer
+      dockerfile: Dockerfile
+    depends_on:
+      - kafka
+      - mongo
+    environment:
+      KAFKA_SERVICE: kafka:9092
+
+    restart: always
+
+
+#  notebook:
+#    image: jupyter/datascience-notebook
+#    depends_on:
+#      - mongo
+#    ports:
+#      - "8888:8888"
+
+  notebook:
+    image: notebook
+    depends_on:
+      - mongo
+    ports:
+      - "8888:8888"
+
+
+
+
+
+#networks:
+#  app-tier:
