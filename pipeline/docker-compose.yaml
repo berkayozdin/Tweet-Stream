@@ -55,7 +55,3 @@ services:
       - mongo
     ports:
       - "8888:8888"
-
-
-#networks:
-#  app-tier:

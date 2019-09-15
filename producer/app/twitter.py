@@ -4,17 +4,15 @@ from tweepy import Stream
 from kafka import SimpleProducer, KafkaClient
 import time
 
-access_token = "68979886-IzdibLmYAx39y8PLNWA7kLPKl2rTDlLPCnf557I45"
-access_token_secret =  "tjVsF4mx4vS9JO0hPcS7b8qoP7oIZK1A8nX0aMwhkNEDG"
-consumer_key =  "jjSz1RE4ftTNmqB1XuUTM22Fc"
-consumer_secret =  "5SNWrhQStzMp3UDwVY7YGuEofQ4QOBBP4rOo4hGnhKpdFQoVi9"
+access_token = "1171481005238046720-oAZIynrQkf5wmbbGkJziH5bU5P9mME"
+access_token_secret =  "kUtpMapZwIK5FSWhJJmgEUGXfrYq8YMXNP44a2DCCq8zb"
+consumer_key =  "BO36N0DiFpnpjnk4t4alFyJES"
+consumer_secret =  "i1aYkttchtpoh3cI5vKY10s2RS7nigoIblaqf4rc0krvjgg1rm"
 
 
 class StdOutListener(StreamListener):
     def on_data(self, data):
-        producer.send_messages("pizza", data.encode('utf-8'))
-        # print('tweet received')
-#         print(data)
+        producer.send_messages("amazon", data.encode('utf-8'))
         return True
     def on_error(self, status):
         print (status)
@@ -24,6 +22,7 @@ success = False
 kafka = None
 while success == False:
     time.sleep(1)
+    
     try:
         kafka = KafkaClient("kafka:9092")
         producer = SimpleProducer(kafka)
@@ -31,8 +30,9 @@ while success == False:
         auth = OAuthHandler(consumer_key, consumer_secret)
         auth.set_access_token(access_token, access_token_secret)
         stream = Stream(auth, l)
-        stream.filter(track="pizza")
+        stream.filter(track="amazon")
         success = True
+        
     except:
         print("producer error")
 
